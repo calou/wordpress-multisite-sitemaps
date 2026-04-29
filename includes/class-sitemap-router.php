@@ -10,6 +10,7 @@ class Multisite_Sitemaps_Router {
 		add_action( 'template_redirect', [ $this, 'handle_request' ] );
 		add_action( 'network_admin_notices', [ $this, 'maybe_notice_no_permalinks' ] );
 		add_action( 'admin_notices', [ $this, 'maybe_notice_no_permalinks' ] );
+		add_filter( 'robots_txt', [ $this, 'add_sitemap_to_robots' ], 10, 2 );
 	}
 
 	public function add_rewrite_rules(): void {
@@ -90,6 +91,13 @@ class Multisite_Sitemaps_Router {
 		}
 
 		exit;
+	}
+
+	public function add_sitemap_to_robots( string $output, bool $public ): string {
+		if ( ! $public ) {
+			return $output;
+		}
+		return $output . "\nSitemap: " . get_home_url( null, '/sitemap.xml' ) . "\n";
 	}
 
 	public function maybe_notice_no_permalinks(): void {
